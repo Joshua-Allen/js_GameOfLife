@@ -1,11 +1,11 @@
 // an array of all the posts as a url
 var lifeCanvas = document.getElementById("lifeCanvas");
-var AstarCanvas = document.getElementById("AstarCanvas");
-var lightCanvas = document.getElementById("lightCanvas");
+//var AstarCanvas = document.getElementById("AstarCanvas");
+//var lightCanvas = document.getElementById("lightCanvas");
 
 var ctx_life = lifeCanvas.getContext("2d");
-var ctx_Astar = AstarCanvas.getContext("2d");
-var ctx_light = lightCanvas.getContext("2d");
+//var ctx_Astar = AstarCanvas.getContext("2d");
+//var ctx_light = lightCanvas.getContext("2d");
 
 var current_canvas = lifeCanvas;
 var current_context = ctx_life;
@@ -119,8 +119,8 @@ function render()
 {
 	//
 	ctx_life.clearRect(0, 0, lifeCanvas.width, lifeCanvas.height);
-	ctx_Astar.clearRect(0, 0, AstarCanvas.width, AstarCanvas.height);
-	ctx_light.clearRect(0, 0, lightCanvas.width, lightCanvas.height);
+	//ctx_Astar.clearRect(0, 0, AstarCanvas.width, AstarCanvas.height);
+	//ctx_light.clearRect(0, 0, lightCanvas.width, lightCanvas.height);
 	
 	//
 	current_context = ctx_life;
@@ -129,12 +129,12 @@ function render()
 	render_life();
 	
 	//
-	current_context = ctx_Astar;
-	draw_line(0, 0, AstarCanvas.width, AstarCanvas.height);
+	//current_context = ctx_Astar;
+	//draw_line(0, 0, AstarCanvas.width, AstarCanvas.height);
 	
 	//
-	current_context = ctx_light;
-	draw_line(0, 0, lightCanvas.width, lightCanvas.height);
+	//current_context = ctx_light;
+	//draw_line(0, 0, lightCanvas.width, lightCanvas.height);
 }
 
 
