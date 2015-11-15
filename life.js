@@ -28,9 +28,9 @@ window.onload = function(){
 	current_context = ctx_life;
 	
 	life = [];
-	cellSize = 5;
-	numCells_x = Math.floor(lifeCanvas.width / cellSize);
-	numCells_y = Math.floor(lifeCanvas.height / cellSize);
+	cellSize = 4;
+	numCells_x = Math.ceil(lifeCanvas.width / cellSize);
+	numCells_y = Math.ceil(lifeCanvas.height / cellSize);
 	numberOfCells = numCells_x * numCells_y;
 
 	running = true;
@@ -61,7 +61,7 @@ function mouse_update() {
 		var x = Math.floor(mouse.x / cellSize);
 		var y = Math.floor(mouse.y / cellSize);
 		
-		life[x + (y*(numCells_x+1))] = true;
+		life[x + (y*(numCells_x))] = true;
 	}
 }
 function mouse_render() {
@@ -80,19 +80,21 @@ function mouse_render() {
 function lifeStart() {
 	for (i = 0; i < numberOfCells; i++) 
 	{
-		life[i] = (100*Math.random() < 10);
+		life[i] = (100*Math.random() < 15);
 	}
 }
+
 function lifeGetCell(x, y) {
-	if (y < 0 || y > numCells_y) 
-		return 0;
-	if (x < 0 || x > numCells_x) 
-		return 0;
+	if (y < 0) y = numCells_y-1;
+	if (y > numCells_y-1) y = 0;
+		
+	if (x < 0) x = numCells_x-1;
+	if (x > numCells_x-1) x = 0;
 	
-	return life[x+(y*(numCells_x))];
+	return life[x + (y*(numCells_x))];
 }
 function lifeSetCell(array, x, y, val) {
-	array[x+y*numCells_x] = val;
+	array[x + (y*(numCells_x))] = val;
 }
 function lifeUpdate() {
 	numCells_x = (lifeCanvas.width / cellSize);
@@ -154,11 +156,10 @@ function render_life() {
 			draw_rect(x*cellSize,y*cellSize,cellSize,cellSize);
 		}
 		x++;
-		if (x > numCells_x)
+		if (x >= numCells_x)
 		{
 			x = 0;
 			y++;
-			
 		}
 	}
 }
@@ -178,7 +179,12 @@ function stop() {
 		//clearInterval(interval);
 	}
 }
-
+function lifeClear(){
+	for (i = 0; i < numberOfCells; i++) 
+	{
+		life[i] = false;
+	}
+}
 // main render
 
 function render(){
