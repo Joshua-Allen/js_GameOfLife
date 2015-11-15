@@ -1,49 +1,100 @@
-// an array of all the posts as a url
-var lifeCanvas = document.getElementById("lifeCanvas");
-//var AstarCanvas = document.getElementById("AstarCanvas");
-//var lightCanvas = document.getElementById("lightCanvas");
+var lifeCanvas;
+var ctx_life
+var current_canvas
+var current_context
 
-var ctx_life = lifeCanvas.getContext("2d");
-//var ctx_Astar = AstarCanvas.getContext("2d");
-//var ctx_light = lightCanvas.getContext("2d");
+var life;
+var cellSize;
+var numCells_x;
+var numCells_y;
+var numberOfCells;
 
-var current_canvas = lifeCanvas;
-var current_context = ctx_life;
+var running;
+var interval;
 
-// life
-var life = [];
-var cellSize = 5;
-var numCells_x = (lifeCanvas.width / cellSize);
-var numCells_y = (lifeCanvas.height / cellSize);
-var numberOfCells = numCells_x * numCells_y;
+var mouse = {
+	x: 0,
+	y: 0,
+	over:false,
+	down:false
+};
 
-setInterval(render, 1000/30);
+// wait for the html to load
+window.onload = function(){
+	lifeCanvas = document.getElementById("lifeCanvas");
+	ctx_life = lifeCanvas.getContext("2d");
+	lifeCanvas.style.cursor = "none";
+	current_canvas = lifeCanvas;
+	current_context = ctx_life;
+	
+	life = [];
+	cellSize = 5;
+	numCells_x = Math.floor(lifeCanvas.width / cellSize);
+	numCells_y = Math.floor(lifeCanvas.height / cellSize);
+	numberOfCells = numCells_x * numCells_y;
 
-lifeStart();
+	running = true;
+	interval = setInterval(render, 1000/30);
+	
+	lifeStart();
+	
+	set_mouseListeners();
+}
 
-// 
-function lifeStart()
-{
+// mouse helper functions
+function set_mouseListeners(){
+	lifeCanvas.addEventListener('mousemove', function(evt) {
+		var rect = lifeCanvas.getBoundingClientRect();
+		mouse.x = Math.round((evt.clientX-rect.left)/(rect.right-rect.left)*lifeCanvas.width);
+		mouse.y = Math.round((evt.clientY-rect.top)/(rect.bottom-rect.top)*lifeCanvas.height);
+	}, false);
+	
+	lifeCanvas.addEventListener('mousedown', function(evt) {mouse.down = true;}, false);
+	lifeCanvas.addEventListener('mouseup', function(evt) {mouse.down = false;}, false);
+	
+	lifeCanvas.addEventListener('mouseover', function(evt) { mouse.over = true;}, false);
+	lifeCanvas.addEventListener('mouseout', function(evt) { mouse.over = false;}, false);
+}
+function mouse_update() {
+	if (mouse.over && mouse.down)
+	{
+		var x = Math.floor(mouse.x / cellSize);
+		var y = Math.floor(mouse.y / cellSize);
+		
+		life[x + (y*(numCells_x+1))] = true;
+	}
+}
+function mouse_render() {
+	if (mouse.over)
+	{
+		var x = Math.floor(mouse.x / cellSize);
+		var y = Math.floor(mouse.y / cellSize);
+		
+		draw_rect(x*cellSize,y*cellSize,cellSize,cellSize);
+	}
+}
+
+
+
+// life functions
+function lifeStart() {
 	for (i = 0; i < numberOfCells; i++) 
 	{
 		life[i] = (100*Math.random() < 10);
 	}
 }
-function lifeGetCell(x, y)
-{
+function lifeGetCell(x, y) {
 	if (y < 0 || y > numCells_y) 
 		return 0;
 	if (x < 0 || x > numCells_x) 
 		return 0;
 	
-	return life[x+y*numCells_x];
+	return life[x+(y*(numCells_x))];
 }
-function lifeSetCell(array, x, y, val)
-{
+function lifeSetCell(array, x, y, val) {
 	array[x+y*numCells_x] = val;
 }
-function lifeUpdate()
-{
+function lifeUpdate() {
 	numCells_x = (lifeCanvas.width / cellSize);
 	numCells_y = (lifeCanvas.height / cellSize);
 	numberOfCells = numCells_x * numCells_y;
@@ -92,8 +143,7 @@ function lifeUpdate()
 	
 	Array.prototype.splice.apply(life, [0, newlife.length].concat(newlife));
 }
-function render_life()
-{
+function render_life() {
 	var x = 0;
 	var y = 0;
 	
@@ -113,54 +163,52 @@ function render_life()
 	}
 }
 
+// sim functions
+function start() {
+	if (!running)
+	{
+		running = true;
+		//interval = setInterval(render, 1000/30);
+	}
+}
+function stop() {
+	if (running)
+	{
+		running = false;
+		//clearInterval(interval);
+	}
+}
 
-//
-function render()
-{
+// main render
+
+function render(){
 	//
 	ctx_life.clearRect(0, 0, lifeCanvas.width, lifeCanvas.height);
-	//ctx_Astar.clearRect(0, 0, AstarCanvas.width, AstarCanvas.height);
-	//ctx_light.clearRect(0, 0, lightCanvas.width, lightCanvas.height);
 	
 	//
 	current_context = ctx_life;
-	//draw_line(0, 0, lifeCanvas.width, lifeCanvas.height);
-	lifeUpdate();
+	if (running) {lifeUpdate();}
+	mouse_update();
 	render_life();
-	
-	//
-	//current_context = ctx_Astar;
-	//draw_line(0, 0, AstarCanvas.width, AstarCanvas.height);
-	
-	//
-	//current_context = ctx_light;
-	//draw_line(0, 0, lightCanvas.width, lightCanvas.height);
+	mouse_render();
 }
 
-
-// draw helper
-function draw_line(x1, y1, x2, y2)
-{
+// draw helper functions
+function draw_line(x1, y1, x2, y2) {
 	current_context.beginPath();
 	current_context.moveTo(x1,y1);
 	current_context.lineTo(x2,y2);
 	current_context.stroke();
 }
-
-function draw_circle(x, y, r)
-{
+function draw_circle(x, y, r) {
 	current_context.beginPath();
 	current_context.arc(x,y,r,0,2*Math.PI);
 	current_context.stroke();
 }
-
-function draw_rect(x,y,width,height)
-{
+function draw_rect(x,y,width,height) {
 	current_context.fillRect(x,y,width,height);
 }
-
-function draw_point(x,y)
-{
+function draw_point(x,y) {
 	current_context.fillRect(x,y,1,1);
 }
 
